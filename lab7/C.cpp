@@ -7,7 +7,6 @@ using namespace std;
 int main()
 {
     cout<<fixed;
-    cout<<setprecision(1);
     float c, sum=0, sum2=0;
     cin>>c;
     vector<float> v, v2;
@@ -20,6 +19,10 @@ int main()
         cin>>c;
     }
     float m=sum/v.size();
-    cout<<m<<" "<<sum2/v2.size()-m*m<<endl;
+    m= round(1000*m)/1000;
+    cout<<setprecision(1);
+    cout<<m<<" ";
+    float m2=sum2/v2.size()-m*m;
+    cout<<m2<<endl;
     return 0;
 }
