@@ -3,27 +3,20 @@
 #include <vector>
 #include <algorithm>
 using namespace std;
-char N;
+short N;
 struct s
 {
-    char x, y, from, level;
-    char** brd;
-    s(char x0, char y0, char from0, char** brd0, char lvl0)
+    short x, y, level;
+    short* brd;
+    
+    s(short x0, short y0, short from, short* brd0, short lvl0) :x{x0}, y{y0}
     {
-        x=x0;
-        y=y0;
-        from=from0;
-        brd=new char*[N];
-        char *b=new char[N*N];
-        for(char i=0; i<N; i++)
+        brd=new short[N*N];
+        for(short i=0; i<N*N; i++)
         {
-            brd[i]=b+N*i;
-            for(char j=0; j<N; j++)
-            {
-                brd[i][j]=brd0[i][j];
-            }
+            brd[i]=brd0[i];
         }
-        brd[x][y]=from0;
+        brd[x+N*y]=from;
         level=lvl0+1;
     }
 };
@@ -32,79 +25,72 @@ struct s
 int main()
 {
     cin>>N;
-    char** board=new char*[N];
-    char* b=new char[N*N];
-    for(char i=0; i<N; i++)
+    short* b=new short[N*N];
+    for(short i=1; i<N*N; i++)
     {
-        board[i]=b+N*i;
-        for(char j=0; j<N; j++)
-        {
-            board[i][j]=-1;
-        }
+        b[i]=-1;
     }
-    board[0][0]=0;
 
-    stack<s*> st;
-    st.push(new s(0, 0, 0, board, 0));
+    stack<s> st;
+	
+    st.push(s{0, 0, 0, b, 0});
 
-    int k=0;
     while(st.size()>0)
     {
-        k++;
-        s* cur=st.top();
+        s cur=st.top();
         st.pop();
-        if(cur->level>N*N-1)
+        if(cur.level>N*N-1)
         {
             cout<<"YES"<<endl;
 
-            for(char i=0;i<N;i++)
+            for(short i=0;i<N*N;i++)
             {
-                for(char j=0;j<N;j++)
-                {
-                    board[i][j]=0;
-                }
+                b[i]='o';
             }
-            for (char i=0;i<N;i++)
-            {
-                for(char j=0;j<N;j++)
-
-                cout<<(cur->brd)[i][j]<<" ";
-                cout<<endl;
-            }
-            char cx=cur->x;
-            char cy=cur->y;
-            char c=(cur->x)+(cur->y)*N;
+            
+            
+            short c=(cur.x)+(cur.y)*N;
+            stack<short> way;
+			
             while(c!=0)
             {
-                board[cx][cy]=1;
-                for(char i=0;i<N;i++)
+                way.push(c);
+                c=(cur.brd)[c];
+            }
+			way.push(0);
+			getchar();
+			while (way.size()>0)
+			{
+				system("cls");
+				short pos=way.top();
+				way.pop();
+				b[pos]='x';
+                for(short i=0;i<N;i++)
                 {
-                    for(char j=0;j<N;j++)
-                        cout<<board[i][j]<<" ";
+                    for(short j=0;j<N;j++)
+                        cout<<(char)b[i+N*j]<<" ";
                     cout<<endl;
                 }
-                cout<<endl;
+				b[pos]='#';
+                
                 getchar();
-
-                c=(cur->brd)[cx][cy];
-                cy=c/N;
-                cx=c%N;
-            }
+			}
             break;
         }
 
 
-        char x = cur->x;
-        char y = cur->y;
-        //cout<<x<<" "<<y<<endl;
+        short x = cur.x;
+        short y = cur.y;
 
-        char var[] = {1,2,-1,-2};
-        for(char i=0; i<4; i++)
+        short var[] = {1,2,-1,-2};
+        for(short i=0; i<4; i++)
         {
-            for(char j=0; j<4; j++)
-                if((abs(var[i])!=abs(var[j]))&&(0<=x+var[i])&&(x+var[i]<N)&&(0<=y+var[j])&&(y+var[j]<N)&&cur->brd[x+var[i]][y+var[j]]==-1)
-                    st.push(new s(x+var[i], y+var[j], x+N*y, cur->brd, cur->level));
+            for(short j=0; j<4; j++)
+                if((abs(var[i])!=abs(var[j]))&&(0<=x+var[i])&&(x+var[i]<N)&&(0<=y+var[j])&&(y+var[j]<N)&&cur.brd[x+var[i]+N*(y+var[j])]==-1)
+                    st.push(s{x+var[i], y+var[j], x+N*y, cur.brd, cur.level});
         }
+        
+        delete[] cur.brd;
     }
     cout<<"NO";
     return 0;
